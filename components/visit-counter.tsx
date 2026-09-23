@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 export function VisitCounter() {
   const [count, setCount] = useState<number | null>(null)
   const [pending, setPending] = useState(false)
+  // Holds the pre-reset value so it can be restored with undo.
+  const [undoValue, setUndoValue] = useState<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -24,7 +26,7 @@ export function VisitCounter() {
     }
   }, [])
 
-  async function handleClick() {
+  async function increment() {
     if (pending) return
     setPending(true)
     try {
@@ -32,6 +34,7 @@ export function VisitCounter() {
       if (res.ok) {
         const data: { count: number } = await res.json()
         setCount(data.count)
+        setUndoValue(null)
       }
     } catch {
       // Ignore failures; keep the current count.
@@ -39,6 +42,29 @@ export function VisitCounter() {
       setPending(false)
     }
   }
+
+  async function setTo(value: number, remember: number | null) {
+    if (pending) return
+    setPending(true)
+    try {
+      const res = await fetch('/api/visits', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ count: value }),
+      })
+      if (res.ok) {
+        const data: { count: number } = await res.json()
+        setCount(data.count)
+        setUndoValue(remember)
+      }
+    } catch {
+      // Ignore failures; keep the current count.
+    } finally {
+      setPending(false)
+    }
+  }
+
+  const disabled = count === null || pending
 
   return (
     <div className="flex items-center gap-2">
@@ -51,12 +77,30 @@ export function VisitCounter() {
       </span>
       <button
         type="button"
-        onClick={handleClick}
-        disabled={count === null || pending}
+        onClick={increment}
+        disabled={disabled}
         aria-label="Increase the visit count by one"
-        className="inline-flex h-5 w-5 items-center justify-center rounded-md border border-[#10B981]/30 bg-[#10B981]/10 text-[#10B981] leading-none transition-colors hover:bg-[#10B981]/20 disabled:cursor-not-allowed disabled:opacity-40"
+        className="inline-flex h-5 items-center justify-center rounded-md border border-[#10B981]/30 bg-[#10B981]/10 px-1.5 text-[#10B981] leading-none transition-colors hover:bg-[#10B981]/20 disabled:cursor-not-allowed disabled:opacity-40"
       >
         +1
+      </button>
+      <button
+        type="button"
+        onClick={() => setTo(0, count)}
+        disabled={disabled || count === 0}
+        aria-label="Reset the visit count to zero"
+        className="inline-flex h-5 items-center justify-center rounded-md border border-white/10 bg-white/5 px-1.5 text-white/50 leading-none transition-colors hover:border-white/20 hover:text-white/70 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Reset
+      </button>
+      <button
+        type="button"
+        onClick={() => undoValue !== null && setTo(undoValue, null)}
+        disabled={disabled || undoValue === null}
+        aria-label="Undo the reset and restore the previous count"
+        className="inline-flex h-5 items-center justify-center rounded-md border border-white/10 bg-white/5 px-1.5 text-white/50 leading-none transition-colors hover:border-white/20 hover:text-white/70 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Undo
       </button>
     </div>
   )

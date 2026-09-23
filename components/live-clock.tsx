@@ -1,43 +1,35 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-function getTimeZones(): string[] {
-  // Intl.supportedValuesOf is widely available in modern browsers.
-  const supported = (
-    Intl as typeof Intl & {
-      supportedValuesOf?: (key: string) => string[]
-    }
-  ).supportedValuesOf
-  if (typeof supported === 'function') {
-    try {
-      return supported('timeZone')
-    } catch {
-      // fall through to the small fallback list below
-    }
-  }
-  return [
-    'UTC',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'Europe/London',
-    'Europe/Paris',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-  ]
-}
+// Common North American timezones.
+const NORTH_AMERICA_ZONES = [
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Phoenix',
+  'America/Los_Angeles',
+  'America/Anchorage',
+  'America/Halifax',
+  'America/St_Johns',
+  'America/Toronto',
+  'America/Vancouver',
+  'America/Mexico_City',
+  'America/Tijuana',
+  'Pacific/Honolulu',
+]
 
 export function LiveClock() {
   const [now, setNow] = useState<Date | null>(null)
   const [zone, setZone] = useState<string | null>(null)
 
-  const zones = useMemo(getTimeZones, [])
-
   useEffect(() => {
     setNow(new Date())
-    setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone
+    // Default to the detected zone if it's in the list, otherwise Eastern.
+    setZone(
+      NORTH_AMERICA_ZONES.includes(detected) ? detected : 'America/New_York',
+    )
     const id = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(id)
   }, [])
@@ -73,9 +65,9 @@ export function LiveClock() {
         onChange={(e) => setZone(e.target.value)}
         className="max-w-[9rem] cursor-pointer truncate rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[0.7rem] text-white/60 outline-none transition-colors hover:border-[#10B981]/40 focus:border-[#10B981]/60"
       >
-        {zones.map((tz) => (
+        {NORTH_AMERICA_ZONES.map((tz) => (
           <option key={tz} value={tz} className="bg-[#0A0A0A] text-white">
-            {tz.replace(/_/g, ' ')}
+            {tz.replace(/^.*\//, '').replace(/_/g, ' ')}
           </option>
         ))}
       </select>
