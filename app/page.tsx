@@ -1,3 +1,5 @@
+import { LiveClock } from '@/components/live-clock'
+
 export default function Page() {
   const year = new Date().getFullYear()
 
@@ -37,7 +39,7 @@ export default function Page() {
           className="animate-fade-slide-up mt-3 text-sm text-white/30"
           style={{ animationDelay: '0.3s' }}
         >
-          Made by Max Rosenfeld
+          Made by Max Rosenfeld · <LiveClock />
         </p>
       </div>
 
