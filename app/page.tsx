@@ -37,7 +37,7 @@ export default function Page() {
           className="animate-fade-slide-up mt-3 text-sm text-white/30"
           style={{ animationDelay: '0.3s' }}
         >
-          Made by Max
+          Made by Max Rosenfeld
         </p>
       </div>
 
