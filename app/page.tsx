@@ -1,4 +1,8 @@
 import { LiveClock } from '@/components/live-clock'
+import { VisitCounter } from '@/components/visit-counter'
+
+// Fixed moment this page was created with v0.
+const CREATED_AT = 'September 23, 2026 at 3:03 PM'
 
 export default function Page() {
   const year = new Date().getFullYear()
@@ -39,8 +43,39 @@ export default function Page() {
           className="animate-fade-slide-up mt-3 text-sm text-white/30"
           style={{ animationDelay: '0.3s' }}
         >
-          Made by Max Rosenfeld · <LiveClock />
+          Made by Max Rosenfeld
         </p>
+
+        {/* Meta row: created timestamp, viewer's live time, live visit count */}
+        <dl
+          className="animate-fade-slide-up mt-10 grid w-full max-w-md grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4"
+          style={{ animationDelay: '0.4s' }}
+        >
+          <div className="flex flex-col items-center gap-1 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3">
+            <dt className="text-[0.65rem] font-medium uppercase tracking-wider text-[#10B981]">
+              v0 · Created
+            </dt>
+            <dd className="text-xs text-white/50">{CREATED_AT}</dd>
+          </div>
+
+          <div className="flex flex-col items-center gap-1 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3">
+            <dt className="text-[0.65rem] font-medium uppercase tracking-wider text-[#10B981]">
+              Your time
+            </dt>
+            <dd className="text-xs text-white/50">
+              <LiveClock />
+            </dd>
+          </div>
+
+          <div className="flex flex-col items-center gap-1 rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3">
+            <dt className="text-[0.65rem] font-medium uppercase tracking-wider text-[#10B981]">
+              Visitors
+            </dt>
+            <dd className="text-xs">
+              <VisitCounter />
+            </dd>
+          </div>
+        </dl>
       </div>
 
       {/* Footer */}
