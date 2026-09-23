@@ -41,15 +41,23 @@ export function VisitCounter() {
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={count === null || pending}
-      aria-label="Add your visit to the count"
-      className="tabular-nums text-white/50 transition-colors hover:text-[#10B981] disabled:cursor-default disabled:opacity-100"
-      suppressHydrationWarning
-    >
-      {count === null ? '—' : count.toLocaleString()}
-    </button>
+    <div className="flex items-center gap-2">
+      <span
+        className="tabular-nums text-white/50"
+        aria-live="polite"
+        suppressHydrationWarning
+      >
+        {count === null ? '—' : count.toLocaleString()}
+      </span>
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={count === null || pending}
+        aria-label="Increase the visit count by one"
+        className="inline-flex h-5 w-5 items-center justify-center rounded-md border border-[#10B981]/30 bg-[#10B981]/10 text-[#10B981] leading-none transition-colors hover:bg-[#10B981]/20 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        +1
+      </button>
+    </div>
   )
 }
